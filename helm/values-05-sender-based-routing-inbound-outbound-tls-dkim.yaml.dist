@@ -1,0 +1,44 @@
+dkim:
+  config:
+    debug:
+    trustedHosts:
+
+postfixRelay:
+  # basic configuration
+  hostname:
+  networks:
+
+  # default outbound relay
+  defaultOutboundRelay:
+    host:
+    username:
+    password:
+    dkimDomain:
+    dkimSelector:
+    dkimKey: |
+    dkimFilter:
+
+  # inbound tls
+  inboundTls:
+  inboundTlsCertificate: |
+  inboundTlsKey: |
+  #inboundTlsSettings:
+
+  # outbound tls
+  outboundTls:
+  #outboundTlsSettings:
+
+  # sender based routing
+  additionalOutBoundRelay:
+    - sender:
+      host:
+      username:
+      password:
+      dkimDomain:
+      dkimSelector:
+      dkimKey: |
+      dkimFilter:
+
+  # dkim
+  dkimMilterHost:
+  dkimTrustedHosts:

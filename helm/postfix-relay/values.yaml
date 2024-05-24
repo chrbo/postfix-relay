@@ -1,0 +1,136 @@
+# Default values for postfix relay
+
+# High availability
+replicaCount: 2
+
+# Role Based Access Control
+rbac:
+  create: true
+  role:
+    rules:
+    - apiGroups:
+      - ''
+      resources:
+      - services
+      - endpoints
+      - pods
+      verbs:
+      - get
+      - watch
+      - list
+
+# Service Account
+serviceAccount:
+  create: true
+  # The name of the ServiceAccount to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+# Postfix container settings
+postfix:
+  image:
+    repository: chrb0/postfix
+    tag: latest
+    pullPolicy: IfNotPresent
+    imagepullsecrets: []
+    #  -name: secret-name
+  resources:
+    requests:
+      cpu: 40m
+      memory: 40Mi
+    limits:
+      cpu: 100m
+      memory: 100Mi
+
+# Dkim container settings
+dkim:
+  image:
+    repository: chrb0/opendkim
+    tag: latest
+    pullPolicy: IfNotPresent
+    imagepullsecrets: []
+    #  -name: secret-name
+  resources:
+    limits:
+      cpu: 250m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# Exporter Docker image
+# https://github.com/kumina/postfix_exporter
+exporter:
+  enabled: false
+  image:
+    repository: eldada.jfrog.io/docker/postfix-exporter
+    tag: 0.2
+    pullPolicy: IfNotPresent
+    imagepullsecrets: []
+    #  -name: secret-name
+  resources:
+    requests:
+      cpu: 10m
+      memory: 40Mi
+    limits:
+      cpu: 100m
+      memory: 100Mi
+
+# Add a ServiceMonitor object for scraping metrics by Prometheus
+# Must have exporter.enabled=true
+serviceMonitor:
+  # Enable only if you have support for ServiceMonitor object with version monitoring.coreos.com/v1 (Prometheus)
+  enabled: false
+
+# Expose pods with service on port 25
+service:
+  type: ClusterIP
+  port: 1025
+  exporterPort: 9154
+  loadBalancerIP:
+
+# main configuration (postfix, dkim)
+postfixRelay:
+  #hostname: my.host.local
+  #networks: '10.0.0.0/8,127.0.0.0/8,172.17.0.0/16,192.0.0.0/8'
+  #customConfig:
+
+  #defaultOutboundRelay:
+  #  host: [relay.host.tld]
+  #  username: username
+  #  password: password
+  #  dkimDomain: domain
+  #  dkimSelector: selector
+  #  dkimKey: |
+  #    key string
+  #  dkimFilter: filter
+
+  #inboundTls: may
+  #inboundTlsCertificate: |
+  #  certificate string
+  #inboundTlsKey: |
+  #  key string
+  #inboundTlsSettings:
+
+  #outboundTls: may
+  #outboundTlsSettings:
+
+  #additionalOutBoundRelay:
+    #- sender:
+    #  host:
+    #  username:
+    #  password:
+    #  dkimDomain: domain
+    #  dkimSelector: selector
+    #  dkimKey: |
+    #    key string
+    #  dkimFilter: filter
+
+  #dkimMilterHost:
+  #dkimTrustedHosts:
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

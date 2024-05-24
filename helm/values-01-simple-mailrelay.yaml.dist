@@ -1,0 +1,10 @@
+postfixRelay:
+  # basic configuration
+  hostname:
+  networks:
+
+  # default outbound relay
+  defaultOutboundRelay:
+    host:
+    username:
+    password:

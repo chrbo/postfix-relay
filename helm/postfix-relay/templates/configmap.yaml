@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "postfix.fullname" . }}-postfix
+  labels:
+    app: {{ template "postfix.name" . }}
+    chart: {{ template "postfix.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+{{- if .Values.postfixRelay.hostname }}
+  POSTFIX_RELAY_HOSTNAME: {{ .Values.postfixRelay.hostname | quote }}
+{{- end }}
+{{- if .Values.postfixRelay.networks }}
+  POSTFIX_RELAY_NETWORKS: {{ .Values.postfixRelay.networks | quote }}
+{{- end }}
+{{- if .Values.postfixRelay.customConfig }}
+  POSTFIX_RELAY_CUSTOM_CONFIG: {{ .Values.postfixRelay.customConfig | quote }}
+{{- end }}
+  POSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_HOST: {{ .Values.postfixRelay.defaultOutboundRelay.host | quote }}
+  POSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_USERNAME: {{ .Values.postfixRelay.defaultOutboundRelay.username | quote }}
+{{- if eq (include "postfix.dkimActive" .) "true" }}
+  {{- if and .Values.postfixRelay.defaultOutboundRelay.dkimDomain .Values.postfixRelay.defaultOutboundRelay.dkimSelector .Values.postfixRelay.defaultOutboundRelay.dkimKey .Values.postfixRelay.defaultOutboundRelay.dkimFilter }}
+  POSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_DKIM_DOMAIN: {{ .Values.postfixRelay.defaultOutboundRelay.dkimDomain | quote }}
+  POSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_DKIM_SELECTOR: {{ .Values.postfixRelay.defaultOutboundRelay.dkimSelector | quote }}
+  POSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_DKIM_FILTER: {{ .Values.postfixRelay.defaultOutboundRelay.dkimFilter | quote }}
+  {{- end }}
+{{- end }}
+{{- if or (eq .Values.postfixRelay.inboundTls "may") (eq .Values.postfixRelay.inboundTls "encrypt") }}
+  POSTFIX_RELAY_INBOUND_TLS: {{ .Values.postfixRelay.inboundTls | quote }}
+  POSTFIX_RELAY_INBOUND_TLS_CERTIFICATE: {{ .Values.postfixRelay.inboundTlsCertificate | b64enc | quote }}
+  {{- if .Values.postfixRelay.inboundTlsSettings }}
+  POSTFIX_RELAY_INBOUND_TLS_SETTINGS: {{ .Values.postfixRelay.inboundTlsSettings | quote }}
+  {{- end }}
+{{- end }}
+{{- if or (eq .Values.postfixRelay.outboundTls "may") (eq .Values.postfixRelay.outboundTls "encrypt") }}
+  POSTFIX_RELAY_OUTBOUND_TLS: {{ .Values.postfixRelay.outboundTls | quote }}
+  {{- if .Values.postfixRelay.outboundTlsSettings }}
+  POSTFIX_RELAY_OUTBOUND_TLS_SETTINGS: {{ .Values.postfixRelay.outboundTlsSettings | quote }}
+  {{- end }}
+{{- end }}
+{{- if .Values.postfixRelay.additionalOutBoundRelay }}
+  {{- range $i, $s := .Values.postfixRelay.additionalOutBoundRelay }}
+  POSTFIX_RELAY_ADDITIONAL_OUTBOUND_RELAY_{{ $i }}_SENDER: {{ $s.sender | quote }}
+  POSTFIX_RELAY_ADDITIONAL_OUTBOUND_RELAY_{{ $i }}_HOST: {{ $s.host | quote }}
+  POSTFIX_RELAY_ADDITIONAL_OUTBOUND_RELAY_{{ $i }}_USERNAME: {{ $s.username | quote }}
+    {{- if eq (include "postfix.dkimActive" $) "true" }}
+      {{- if and $s.dkimDomain $s.dkimSelector $s.dkimKey $s.dkimFilter }}
+  POSTFIX_RELAY_ADDITIONAL_OUTBOUND_RELAY_{{ $i }}_DKIM_DOMAIN: {{ $s.dkimDomain | quote }}
+  POSTFIX_RELAY_ADDITIONAL_OUTBOUND_RELAY_{{ $i }}_DKIM_SELECTOR: {{ $s.dkimSelector | quote }}
+  POSTFIX_RELAY_ADDITIONAL_OUTBOUND_RELAY_{{ $i }}_DKIM_FILTER: {{ $s.dkimFilter | quote }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- if eq (include "postfix.dkimActive" .) "true" }}
+  {{- if .Values.postfixRelay.dkimMilterHost }}
+  POSTFIX_RELAY_DKIM_MILTER_HOST: {{ .Values.postfixRelay.dkimMilterHost | quote }}
+  {{- end }}
+  {{- if .Values.postfixRelay.dkimTrustedHosts }}
+  POSTFIX_RELAY_DKIM_TRUSTED_HOSTS: {{ .Values.postfixRelay.dkimTrustedHosts | quote }}
+  {{- end }}
+{{- end }}

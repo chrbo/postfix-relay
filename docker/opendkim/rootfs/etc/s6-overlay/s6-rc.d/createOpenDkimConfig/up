@@ -1,0 +1,2 @@
+foreground { echo "Creating OpenDkim configuration by calling /usr/local/bin/createOpenDkimConfig.sh" }
+/usr/local/bin/createOpenDkimConfig.sh

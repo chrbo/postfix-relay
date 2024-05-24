@@ -1,0 +1,20 @@
+postfixRelay:
+  # basic configuration
+  hostname:
+  networks:
+
+  # default outbound relay
+  defaultOutboundRelay:
+    host:
+    username:
+    password:
+
+  # inbound tls
+  inboundTls:
+  inboundTlsCertificate: |
+  inboundTlsKey: |
+  #inboundTlsSettings:
+
+  # outbound tls
+  outboundTls:
+  #outboundTlsSettings:

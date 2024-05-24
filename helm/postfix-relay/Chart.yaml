@@ -1,0 +1,17 @@
+apiVersion: v1
+version: 1.0
+description: A Helm chart for a highly available postfix relay with different common configuration options in Kubernetes
+name: postfix-relay
+keywords:
+  - postfix
+  - relay
+  - dkim
+  - inbound TLS
+  - outbound TLS
+  - sender based routing
+sources:
+  - https://github.com/chrbo/postfix-relay
+maintainers:
+  - name: Christian Bode
+    email: christian.bode@c-b-o.net
+    url: https://github.com/chrbo
