@@ -129,6 +129,11 @@ postfixRelay:
   #dkimMilterHost:
   #dkimTrustedHosts:
 
+  csi:
+    enabled: false
+    #provider: vault
+    #address: http://vault.secret-management.svc.cluster.local:8200
+
 nodeSelector: {}
 
 tolerations: []
