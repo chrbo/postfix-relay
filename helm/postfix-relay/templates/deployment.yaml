@@ -47,6 +47,13 @@ spec:
             name: metrics
           - mountPath: /data/log/
             name: logs
+{{- if .Values.postfixRelay.csi }}
+  {{- if .Values.postfixRelay.csi.enabled }}
+          - name: {{ template "postfix.fullname" . }}-postfix
+            mountPath: "/mnt/secrets-store"
+            readOnly: true
+  {{- end }}
+{{- end }}
         resources:
 {{ toYaml .Values.postfix.resources | indent 10 }}
 {{- if .Values.exporter.enabled }}
@@ -84,6 +91,16 @@ spec:
           emptyDir: {}
         - name: logs
           emptyDir: {}
+{{- if .Values.postfixRelay.csi }}
+  {{- if .Values.postfixRelay.csi.enabled }}
+        - name: {{ template "postfix.fullname" . }}-postfix
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ template "postfix.fullname" . }}-postfix
+  {{- end }}
+{{- end }}
 {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
