@@ -20,7 +20,7 @@ data:
   POSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_HOST: {{ .Values.postfixRelay.defaultOutboundRelay.host | quote }}
   POSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_USERNAME: {{ .Values.postfixRelay.defaultOutboundRelay.username | quote }}
 {{- if eq (include "postfix.dkimActive" .) "true" }}
-  {{- if and .Values.postfixRelay.defaultOutboundRelay.dkimDomain .Values.postfixRelay.defaultOutboundRelay.dkimSelector .Values.postfixRelay.defaultOutboundRelay.dkimKey .Values.postfixRelay.defaultOutboundRelay.dkimFilter }}
+  {{- if and .Values.postfixRelay.defaultOutboundRelay.dkimDomain .Values.postfixRelay.defaultOutboundRelay.dkimSelector .Values.postfixRelay.defaultOutboundRelay.dkimFilter }}
   POSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_DKIM_DOMAIN: {{ .Values.postfixRelay.defaultOutboundRelay.dkimDomain | quote }}
   POSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_DKIM_SELECTOR: {{ .Values.postfixRelay.defaultOutboundRelay.dkimSelector | quote }}
   POSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_DKIM_FILTER: {{ .Values.postfixRelay.defaultOutboundRelay.dkimFilter | quote }}
@@ -45,7 +45,7 @@ data:
   POSTFIX_RELAY_ADDITIONAL_OUTBOUND_RELAY_{{ $i }}_HOST: {{ $s.host | quote }}
   POSTFIX_RELAY_ADDITIONAL_OUTBOUND_RELAY_{{ $i }}_USERNAME: {{ $s.username | quote }}
     {{- if eq (include "postfix.dkimActive" $) "true" }}
-      {{- if and $s.dkimDomain $s.dkimSelector $s.dkimKey $s.dkimFilter }}
+      {{- if and $s.dkimDomain $s.dkimSelector $s.dkimFilter }}
   POSTFIX_RELAY_ADDITIONAL_OUTBOUND_RELAY_{{ $i }}_DKIM_DOMAIN: {{ $s.dkimDomain | quote }}
   POSTFIX_RELAY_ADDITIONAL_OUTBOUND_RELAY_{{ $i }}_DKIM_SELECTOR: {{ $s.dkimSelector | quote }}
   POSTFIX_RELAY_ADDITIONAL_OUTBOUND_RELAY_{{ $i }}_DKIM_FILTER: {{ $s.dkimFilter | quote }}
