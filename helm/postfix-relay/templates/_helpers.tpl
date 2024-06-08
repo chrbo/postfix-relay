@@ -46,15 +46,29 @@ Create the name of the service account to use
 Check if DKIM is active
 */}}
 {{- define "postfix.dkimActive" -}}
-    {{- if and (hasKey .Values.postfixRelay.defaultOutboundRelay "dkimDomain") (hasKey .Values.postfixRelay.defaultOutboundRelay "dkimSelector") (hasKey .Values.postfixRelay.defaultOutboundRelay "dkimKey") (hasKey .Values.postfixRelay.defaultOutboundRelay "dkimFilter") -}}
-    true
-    {{- else if .Values.postfixRelay.additionalOutBoundRelay -}}
-        {{- range $i, $s := .Values.postfixRelay.additionalOutBoundRelay -}}
-            {{- if and (hasKey $s "dkimDomain") (hasKey $s "dkimSelector") (hasKey $s "dkimKey") (hasKey $s "dkimFilter") -}}
-            true
+    {{- if .Values.postfixRelay.csi.enabled }}
+        {{- if and (hasKey .Values.postfixRelay.defaultOutboundRelay "dkimDomain") (hasKey .Values.postfixRelay.defaultOutboundRelay "dkimSelector") (hasKey .Values.postfixRelay.defaultOutboundRelay "dkimFilter") -}}
+        true
+        {{- else if .Values.postfixRelay.additionalOutBoundRelay -}}
+            {{- range $i, $s := .Values.postfixRelay.additionalOutBoundRelay -}}
+                {{- if and (hasKey $s "dkimDomain") (hasKey $s "dkimSelector") (hasKey $s "dkimFilter") -}}
+                true
+                {{- end -}}
             {{- end -}}
+        {{- else -}}
+        false
         {{- end -}}
-    {{- else -}}
-    false
-    {{- end -}}
+    {{- else }}
+        {{- if and (hasKey .Values.postfixRelay.defaultOutboundRelay "dkimDomain") (hasKey .Values.postfixRelay.defaultOutboundRelay "dkimSelector") (hasKey .Values.postfixRelay.defaultOutboundRelay "dkimKey") (hasKey .Values.postfixRelay.defaultOutboundRelay "dkimFilter") -}}
+        true
+        {{- else if .Values.postfixRelay.additionalOutBoundRelay -}}
+            {{- range $i, $s := .Values.postfixRelay.additionalOutBoundRelay -}}
+                {{- if and (hasKey $s "dkimDomain") (hasKey $s "dkimSelector") (hasKey $s "dkimKey") (hasKey $s "dkimFilter") -}}
+                true
+                {{- end -}}
+            {{- end -}}
+        {{- else -}}
+        false
+        {{- end -}}
+    {{- end }}
 {{- end -}}
