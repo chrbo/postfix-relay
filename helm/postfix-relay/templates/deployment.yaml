@@ -83,6 +83,12 @@ spec:
               name: {{ template "postfix.fullname" . }}-postfix
           - secretRef:
               name: {{ template "postfix.fullname" . }}-postfix
+  {{- if .Values.postfixRelay.csi.enabled }}
+        volumeMounts:
+          - name: {{ template "postfix.fullname" . }}-postfix
+            mountPath: "/mnt/secrets-store"
+            readOnly: true
+  {{- end }}
         resources:
 {{ toYaml .Values.dkim.resources | indent 10 }}
 {{ end }}
