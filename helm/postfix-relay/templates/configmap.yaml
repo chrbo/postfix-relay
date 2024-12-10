@@ -61,3 +61,9 @@ data:
   POSTFIX_RELAY_DKIM_TRUSTED_HOSTS: {{ .Values.postfixRelay.dkimTrustedHosts | quote }}
   {{- end }}
 {{- end }}
+{{- if .Values.postfixRelay.transport }}
+  {{- range $i, $s := .Values.postfixRelay.transport }}
+  POSTFIX_RELAY_TRANSPORT_{{ $i }}_PATTERN: {{ $s.pattern | quote }}
+  POSTFIX_RELAY_TRANSPORT_{{ $i }}_TARGET: {{ $s.target | quote }}
+  {{- end }}
+{{- end }}

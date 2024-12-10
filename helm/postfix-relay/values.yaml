@@ -129,6 +129,10 @@ postfixRelay:
   #dkimMilterHost:
   #dkimTrustedHosts:
 
+  #transport:
+    #- pattern:
+    #  target:
+
   csi:
     enabled: false
     #provider: vault

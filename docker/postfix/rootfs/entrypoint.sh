@@ -106,6 +106,34 @@ function create_config() {
   fi
 
   ########################################################################################################################
+  # Validate transport configuration                                                                                     #
+  ########################################################################################################################
+  LOOP_SUCCESS="true"
+
+  while read -r POSTFIX_RELAY_TRANSPORT_LINE; do
+    [[ -z "${POSTFIX_RELAY_TRANSPORT_LINE}" ]] && break
+
+    VAR_PATTERN="${POSTFIX_RELAY_TRANSPORT_LINE}PATTERN"
+    if [ -z "${!VAR_PATTERN}" ]; then
+      echo "Empty environment variable ${VAR_PATTERN}"
+      LOOP_SUCCESS="false"
+      break
+    fi
+
+    VAR_TARGET="${POSTFIX_RELAY_TRANSPORT_LINE}TARGET"
+    if [ -z "${!VAR_TARGET}" ]; then
+      echo "Empty environment variable ${VAR_TARGET}"
+      LOOP_SUCCESS="false"
+      break
+    fi
+
+  done <<< $(env | grep -E '^POSTFIX_RELAY_TRANSPORT_[0-9]{1,7}_(PATTERN|TARGET)' | awk -F_ '{print $1"_"$2"_"$3"_"$4"_"}' | sort -n | uniq)
+
+  if [ "${LOOP_SUCCESS}" == "false" ]; then
+    exit 1;
+  fi
+
+  ########################################################################################################################
   # Set DKIM variables                                                                                                   #
   ########################################################################################################################
   POSTFIX_RELAY_DKIM_MILTER_HOST=${POSTFIX_RELAY_DKIM_MILTER_HOST:-false}
@@ -113,23 +141,23 @@ function create_config() {
   ########################################################################################################################
   # Display configuration                                                                                                #
   ########################################################################################################################
-  CONFIG_OUTPUT="POSTFIX_RELAY_HOSTNAME:${POSTFIX_RELAY_HOSTNAME}"
-  CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_NETWORKS:${POSTFIX_RELAY_NETWORKS}"
+  CONFIG_OUTPUT="POSTFIX_RELAY_HOSTNAME|${POSTFIX_RELAY_HOSTNAME}"
+  CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_NETWORKS|${POSTFIX_RELAY_NETWORKS}"
 
-  CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_HOST:${POSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_HOST}"
-  CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_USERNAME:${POSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_USERNAME}"
-  CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_PASSWORD:********** (masked)"
+  CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_HOST|${POSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_HOST}"
+  CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_USERNAME|${POSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_USERNAME}"
+  CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_DEFAULT_OUTBOUND_RELAY_PASSWORD|********** (masked)"
 
-  CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_INBOUND_TLS:${POSTFIX_RELAY_INBOUND_TLS}"
+  CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_INBOUND_TLS|${POSTFIX_RELAY_INBOUND_TLS}"
   if [ "${POSTFIX_RELAY_INBOUND_TLS}" == "may" ] || [ "${POSTFIX_RELAY_INBOUND_TLS}" == "encrypt" ]; then
-    CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_INBOUND_TLS_CERTIFICATE:${POSTFIX_RELAY_INBOUND_TLS_CERTIFICATE}"
-    CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_INBOUND_TLS_KEY:********** (masked)"
-    CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_INBOUND_TLS_SETTINGS:${POSTFIX_RELAY_INBOUND_TLS_SETTINGS}"
+    CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_INBOUND_TLS_CERTIFICATE|${POSTFIX_RELAY_INBOUND_TLS_CERTIFICATE}"
+    CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_INBOUND_TLS_KEY|********** (masked)"
+    CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_INBOUND_TLS_SETTINGS|${POSTFIX_RELAY_INBOUND_TLS_SETTINGS}"
   fi
 
-  CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_OUTBOUND_TLS:${POSTFIX_RELAY_OUTBOUND_TLS}"
+  CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_OUTBOUND_TLS|${POSTFIX_RELAY_OUTBOUND_TLS}"
   if [ "${POSTFIX_RELAY_OUTBOUND_TLS}" == "may" ] || [ "${POSTFIX_RELAY_OUTBOUND_TLS}" == "encrypt" ]; then
-    CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_OUTBOUND_TLS_SETTINGS:${POSTFIX_RELAY_OUTBOUND_TLS_SETTINGS}"
+    CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_OUTBOUND_TLS_SETTINGS|${POSTFIX_RELAY_OUTBOUND_TLS_SETTINGS}"
   fi
 
   while read -r POSTFIX_RELAY_SENDER_BASED_ROUTING_LINE; do
@@ -140,22 +168,33 @@ function create_config() {
     VAR_OUTBOUND_RELAY_USERNAME="${POSTFIX_RELAY_SENDER_BASED_ROUTING_LINE}USERNAME"
     VAR_OUTBOUND_RELAY_PASSWORD="${POSTFIX_RELAY_SENDER_BASED_ROUTING_LINE}PASSWORD"
 
-    CONFIG_OUTPUT="${CONFIG_OUTPUT}\n${VAR_SENDER}:${!VAR_SENDER}"
-    CONFIG_OUTPUT="${CONFIG_OUTPUT}\n${VAR_OUTBOUND_RELAY_HOST}:${!VAR_OUTBOUND_RELAY_HOST}"
-    CONFIG_OUTPUT="${CONFIG_OUTPUT}\n${VAR_OUTBOUND_RELAY_USERNAME}:${!VAR_OUTBOUND_RELAY_USERNAME}"
-    CONFIG_OUTPUT="${CONFIG_OUTPUT}\n${VAR_OUTBOUND_RELAY_PASSWORD}:********** (masked)"
+    CONFIG_OUTPUT="${CONFIG_OUTPUT}\n${VAR_SENDER}|${!VAR_SENDER}"
+    CONFIG_OUTPUT="${CONFIG_OUTPUT}\n${VAR_OUTBOUND_RELAY_HOST}|${!VAR_OUTBOUND_RELAY_HOST}"
+    CONFIG_OUTPUT="${CONFIG_OUTPUT}\n${VAR_OUTBOUND_RELAY_USERNAME}|${!VAR_OUTBOUND_RELAY_USERNAME}"
+    CONFIG_OUTPUT="${CONFIG_OUTPUT}\n${VAR_OUTBOUND_RELAY_PASSWORD}|********** (masked)"
   done <<< $(env | grep -E '^POSTFIX_RELAY_ADDITIONAL_OUTBOUND_RELAY_[0-9]{1,7}_DKIM' | awk -F_ '{print $1"_"$2"_"$3"_"$4"_"$5"_"$6"_"}' | uniq | sort -n)
 
   if [ "${POSTFIX_RELAY_DKIM_MILTER_HOST}" != "false" ]; then
-    CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_DKIM_MILTER_HOST:${POSTFIX_RELAY_DKIM_MILTER_HOST}"
+    CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_DKIM_MILTER_HOST|${POSTFIX_RELAY_DKIM_MILTER_HOST}"
   fi
 
   if [ ! -z "${POSTFIX_RELAY_CUSTOM_CONFIG}" ]; then
-    CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_CUSTOM_CONFIG:${POSTFIX_RELAY_CUSTOM_CONFIG}"
+    CONFIG_OUTPUT="${CONFIG_OUTPUT}\nPOSTFIX_RELAY_CUSTOM_CONFIG|${POSTFIX_RELAY_CUSTOM_CONFIG}"
   fi
 
+  while read -r POSTFIX_RELAY_TRANSPORT_LINE; do
+    [[ -z "${POSTFIX_RELAY_TRANSPORT_LINE}" ]] && break
+
+    VAR_PATTERN="${POSTFIX_RELAY_TRANSPORT_LINE}PATTERN"
+    VAR_TARGET="${POSTFIX_RELAY_TRANSPORT_LINE}TARGET"
+
+    CONFIG_OUTPUT="${CONFIG_OUTPUT}\n${VAR_PATTERN}|${!VAR_PATTERN}"
+    CONFIG_OUTPUT="${CONFIG_OUTPUT}\n${VAR_TARGET}|${!VAR_TARGET}"
+  done <<< $(env | grep -E '^POSTFIX_RELAY_TRANSPORT_[0-9]{1,7}_(PATTERN|TARGET)' | awk -F_ '{print $1"_"$2"_"$3"_"$4"_"}' | sort -n | uniq)
+
+
   echo "Running configuration:"
-  echo -e "${CONFIG_OUTPUT}" | column -t -s ':' --table-columns C1,C2 --table-noheadings --table-wrap C2
+  echo -e "${CONFIG_OUTPUT}" | column -t -s '|' --table-columns C1,C2 --table-noheadings --table-wrap C2
 
   ########################################################################################################################
   # Create configuration                                                                                                 #
@@ -240,6 +279,22 @@ function create_config() {
       done
       IFS=${OLD_IFS}
   fi
+
+  while read -r POSTFIX_RELAY_TRANSPORT_LINE; do
+    [[ -z "${POSTFIX_RELAY_TRANSPORT_LINE}" ]] && break
+
+    VAR_PATTERN="${POSTFIX_RELAY_TRANSPORT_LINE}PATTERN"
+    VAR_TARGET="${POSTFIX_RELAY_TRANSPORT_LINE}TARGET"
+
+    echo "${!VAR_PATTERN} ${!VAR_TARGET}" >> /etc/postfix/transport || exit 1
+
+  done <<< $(env | grep -E '^POSTFIX_RELAY_TRANSPORT_[0-9]{1,7}_(PATTERN|TARGET)' | awk -F_ '{print $1"_"$2"_"$3"_"$4"_"}' | sort -n | uniq)
+
+  if [ -f /etc/postfix/transport ]; then
+    postmap /etc/postfix/transport || exit 1
+    postconf 'transport_maps = lmdb:/etc/postfix/transport' || exit 1
+  fi
+
 }
 
 if [ "$1" = 'postfix' ]; then
