@@ -41,6 +41,7 @@ You can configure the following common configuration options and combine them:
 * [Inbound mail transport via TLS](#inbound-mail-transport-via-tls)
 * [Outbound mail transport via TLS](#outbound-mail-transport-via-tls)
 * [Sender based routing](#sender-based-routing)
+* [Define the transport by recipient](#define-the-transport-by-recipient)
 * [DKIM](#dkim)
 
 For each scenario a .env and values dist file is provided. The .env dist files are located in the projects root
@@ -159,6 +160,28 @@ postfixRelay:
 To configure this scenario, you can use the [.env-04-simple-mailrelay-inbound-outbound-tls-sender-based-routing.dist](.env-04-simple-mailrelay-inbound-outbound-tls-sender-based-routing.dist)
 and the [helm/values-04-sender-based-routing-inbound-outbound-tls.yaml.dist](helm/values-04-sender-based-routing-inbound-outbound-tls.yaml.dist)
 dist files.
+### Define the transport by recipient
+With this configuration you are able to define the next hop for a mail by the recipient. To
+achieve this you have to configure the following values:
+* Multiple patterns for the transport configuration
+* Multiple targets for the transport configuration
+#### Environment variables:
+```
+POSTFIX_RELAY_TRANSPORT_0_PATTERN=
+POSTFIX_RELAY_TRANSPORT_0_TARGET=
+```
+#### Helm values:
+```yaml
+postfixRelay:
+  transport:
+    - pattern:
+      target:
+```
+You can find additional information about transport at the [postfix transport readme](https://www.postfix.org/transport.5.html).
+
+To configure this scenario, you can use the [.env-05-simple-mailrelay-transport.dist](.env-05-simple-mailrelay-transport.dist)
+and the [helm/values-05-simple-mailrelay-transport.yaml.dist](helm/values-05-simple-mailrelay-transport.yaml.dist)
+dist files.
 ### DKIM
 This configuration option handles the signing of forwarded mails via the
 [DKIM](https://en.wikipedia.org/wiki/DomainKeys_Identified_Mail) pattern.
@@ -202,8 +225,8 @@ postfixRelay:
       dkimKey:
       dkimFilter:
 ```
-To configure this scenario, you can use the [.env-05-simple-mailrelay-inbound-outbound-tls-sender-based-routing-dkim.dist](.env-05-simple-mailrelay-inbound-outbound-tls-sender-based-routing-dkim.dist)
-and the [helm/values-05-sender-based-routing-inbound-outbound-tls-dkim.yaml.dist](helm/values-05-sender-based-routing-inbound-outbound-tls-dkim.yaml.dist)
+To configure this scenario, you can use the [.env-06-simple-mailrelay-inbound-outbound-tls-sender-based-routing-dkim.dist](.env-06-simple-mailrelay-inbound-outbound-tls-sender-based-routing-dkim.dist)
+and the [helm/values-06-sender-based-routing-inbound-outbound-tls-dkim.yaml.dist](helm/values-06-sender-based-routing-inbound-outbound-tls-dkim.yaml.dist)
 dist files.
 ## Build Docker images
 You can build the postfix Docker image locally by executing:
