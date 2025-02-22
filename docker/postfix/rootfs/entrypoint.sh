@@ -59,7 +59,7 @@ function create_config() {
   POSTFIX_RELAY_OUTBOUND_TLS=${POSTFIX_RELAY_OUTBOUND_TLS:-false}
 
   if [ "${POSTFIX_RELAY_OUTBOUND_TLS}" == "may" ] || [ "${POSTFIX_RELAY_OUTBOUND_TLS}" == "encrypt" ]; then
-    POSTFIX_RELAY_OUTBOUND_TLS_SETTINGS=${POSTFIX_RELAY_OUTBOUND_TLS_SETTINGS:-smtp_use_tls=yes;smtp_tls_loglevel=1;smtp_tls_mandatory_protocols=!SSLv2,!SSLv3,!TLSv1;smtp_tls_protocols=!SSLv2,!SSLv3,!TLSv1}
+    POSTFIX_RELAY_OUTBOUND_TLS_SETTINGS=${POSTFIX_RELAY_OUTBOUND_TLS_SETTINGS:-smtp_tls_loglevel=1;smtp_tls_mandatory_protocols=!SSLv2,!SSLv3,!TLSv1;smtp_tls_protocols=!SSLv2,!SSLv3,!TLSv1}
     POSTFIX_RELAY_OUTBOUND_TLS_SETTINGS="smtp_tls_security_level=${POSTFIX_RELAY_OUTBOUND_TLS};${POSTFIX_RELAY_OUTBOUND_TLS_SETTINGS}"
   fi
 
