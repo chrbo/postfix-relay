@@ -2,6 +2,7 @@
 
 # High availability
 replicaCount: 2
+revisionHistoryLimit: 10
 
 # Role Based Access Control
 rbac:
